@@ -1,0 +1,7 @@
+option_id,option_name,materials,garment_mass_g,yarn_type,washes_in_life,tumble_dry_share_pct,fibre_cost_eur_per_kg
+A,Virgin polyester,FIB_PES:100,140,filament,50,20,1.30
+B,Recycled polyester (bottles),FIB_RPES:100,140,filament,50,20,1.60
+C,Conventional cotton,FIB_CO:100,180,staple,40,30,2.00
+D,Organic cotton,FIB_OCO:100,180,staple,40,30,2.60
+E,Polyester with biodegradability additive (generic),FIB_PESBD:100,140,filament,50,20,2.00
+F,Recycled polyester and organic cotton blend 50/50,FIB_RPES:50;FIB_OCO:50,160,staple,45,25,2.10

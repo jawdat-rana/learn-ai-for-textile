@@ -1,0 +1,12 @@
+country,kg_co2e_per_kwh,year,heat_fuel,source
+China,0.555,2024,coal,S14
+Bangladesh,0.696,2024,gas,S14
+India,0.705,2024,coal,S14
+Vietnam,0.484,2024,coal,S14
+Turkey,0.470,2024,gas,S14
+Pakistan,0.374,2024,gas,S14
+Portugal,0.111,2024,gas,S14
+Italy,0.281,2024,gas,S14
+Germany,0.336,2024,gas,S14
+Switzerland,0.035,2024,gas,S14
+EU-27,0.211,2024,gas,S14

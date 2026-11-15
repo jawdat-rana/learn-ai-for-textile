@@ -1,0 +1,7 @@
+product_id,product_name,Raw materials,Yarn,Fabric,Dyeing and finishing,Garment making,Transport,Use,End of life,total_kg_co2e,kg_co2e_per_kg_garment
+P01,Performance T-shirt,0.536,0.288,0.113,0.708,0.11,0.083,0.464,0.129,2.432,17.373
+P02,Classic cotton T-shirt,0.668,0.775,0.182,0.66,0.148,0.097,0.564,0.032,3.128,17.378
+P03,Fleece jacket,1.666,0.897,0.352,2.203,0.234,0.219,0.684,0.387,6.642,15.814
+P04,Sports leggings,2.621,0.413,0.162,1.134,0.137,2.722,0.485,0.218,7.892,34.315
+P05,Workwear trousers,2.199,1.607,1.102,1.799,0.244,0.192,5.329,0.344,12.817,24.649
+P06,Swim shorts,0.384,0.076,0.086,0.478,0.065,0.138,0.321,0.175,1.722,9.066

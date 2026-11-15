@@ -1,0 +1,7 @@
+option_id,option_name,kg_co2e_per_garment,low,high,g_co2e_per_wear,low_per_wear,high_per_wear,raw_materials,use,end_of_life,fibre_cost_eur
+A,Virgin polyester,2.432,2.289,2.88,48.644,45.778,57.601,0.536,0.464,0.129,0.232
+B,Recycled polyester (bottles),2.146,2.057,2.255,42.928,41.134,45.097,0.25,0.464,0.129,0.286
+C,Conventional cotton,3.171,2.615,3.681,79.263,65.379,92.021,0.668,0.564,0.032,0.495
+D,Organic cotton,2.873,2.727,3.013,71.837,68.164,75.313,0.371,0.564,0.032,0.644
+E,Polyester with biodegradability additive (generic),2.45,2.307,2.959,49.001,46.143,59.176,0.554,0.464,0.129,0.357
+F,Recycled polyester and organic cotton blend 50/50,2.629,2.508,2.757,58.421,55.742,61.277,0.319,0.521,0.088,0.462

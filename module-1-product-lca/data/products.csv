@@ -1,0 +1,7 @@
+product_id,product_name,yarn_type,construction,garment_mass_g,mill_country,make_country,market,cut_waste_pct,washes_in_life,tumble_dry_share_pct,incineration_pct,landfill_pct
+P01,Performance T-shirt,filament,knit,140,China,China,EU-27,15,50,20,40,30
+P02,Classic cotton T-shirt,staple,knit,180,Bangladesh,Bangladesh,EU-27,15,40,30,40,30
+P03,Fleece jacket,filament,knit,420,China,China,EU-27,18,30,10,40,30
+P04,Sports leggings,filament,knit,230,Vietnam,Vietnam,EU-27,15,50,0,40,30
+P05,Workwear trousers,staple,woven,520,Turkey,Turkey,EU-27,20,100,50,40,30
+P06,Swim shorts,filament,woven,190,Portugal,Portugal,EU-27,12,40,0,40,30

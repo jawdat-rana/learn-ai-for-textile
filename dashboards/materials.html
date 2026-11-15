@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Material Substitution Explorer</title>
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .layout { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 900px) { .layout { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); } }
+  .bars .row { display: grid; grid-template-columns: minmax(130px, 220px) 1fr 74px; gap: 10px; align-items: center; font-size: 13px; margin: 8px 0; }
+  .bars .track { height: 16px; background: var(--surface-2); border-radius: 4px; position: relative; }
+  .bars .fill { height: 100%; border-radius: 0 4px 4px 0; background: var(--s1); display: block; }
+  .bars .range { position: absolute; top: 7px; height: 2px; background: var(--ink); }
+  .bars .range::before, .bars .range::after { content: ""; position: absolute; top: -5px; width: 2px; height: 12px; background: var(--ink); }
+  .bars .range::before { left: 0; } .bars .range::after { right: 0; }
+  .bars .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .weights label { display: grid; grid-template-columns: 120px 1fr 44px; gap: 8px; align-items: center; font-size: 14px; margin: 6px 0; }
+  .weights output { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .score { display: inline-block; height: 10px; border-radius: 3px; background: var(--s3); vertical-align: middle; margin-right: 6px; }
+  td input[type="number"] { width: 64px; font: inherit; font-size: 13px; padding: 2px 4px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--ink); }
+  td.wrap { white-space: normal; min-width: 320px; }
+  #status { font-size: 13px; color: var(--ink-2); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="home" href="../index.html">← AI for Textile Professionals</a>
+    <nav class="links">
+      <a data-gh="module-2-material-substitution/README.md" href="#">Module guide</a>
+      <a data-gh="module-2-material-substitution/prompts.md" href="#">Prompts that built this</a>
+      <a data-gh="dashboards/materials.html" href="#">See the code</a>
+    </nav>
+  </header>
+
+  <h1>Material Substitution Explorer</h1>
+  <p class="lede">Six fibre options for the same performance T-shirt. Compare the climate impact per garment and per wear, then weigh what a carbon number can't show.</p>
+  <div class="callout warn small"><strong>Screening level.</strong> This is not an ISO 14044 comparative assertion and must not be used to claim one material is "better" in public. Where ranges overlap, this data can't separate the options.</div>
+
+  <div class="controls">
+    <label>Wears per wash <select id="wpw"><option>1</option><option>2</option><option>3</option></select></label>
+    <label><input type="checkbox" id="trust"> Accept option E's biodegradability claim without test evidence</label>
+    <button id="copy" class="primary">Copy summary for AI</button>
+    <span id="status"></span>
+  </div>
+
+  <div class="layout">
+    <section class="card">
+      <h3>Climate impact per wear</h3>
+      <p class="small muted" style="margin-top:0">g CO2e per wear. Black line = range from published fibre and landfill factors. Change "washes in life" in the table to test durability.</p>
+      <div class="bars" id="bars"></div>
+    </section>
+    <section class="card weights">
+      <h3>What matters to you?</h3>
+      <p class="small muted" style="margin-top:0">Weights are shown as % of the total.</p>
+      <div id="weights"></div>
+    </section>
+  </div>
+
+  <h2>Scorecard <span class="muted small">5 = best</span></h2>
+  <div class="table-scroll"><table id="table"></table></div>
+  <p class="small muted">Climate and cost scores are relative: the best option gets 5 and the worst 1, even when the gap is small. Hover a score for the reason behind it. <strong>Evidence is not in the weighted score.</strong> Read it before trusting a high score.</p>
+
+  <div class="callout warn">
+    <strong>Before you trust this:</strong> durability (washes in life) is an assumption, and it moves the per-wear result as much as the fibre choice. Microplastic, water and end-of-life scores are judgement calls written in <a data-gh="module-2-material-substitution/data/beyond_carbon.csv" href="#">beyond_carbon.csv</a>. Ask your AI: "Which assumption, if wrong, would change the ranking?"
+  </div>
+
+  <footer>Built by AI from the prompts in <a data-gh="module-2-material-substitution/prompts.md" href="#">prompts.md</a>. Same model as <a data-gh="module-2-material-substitution/analysis/material_compare.py" href="#">the Python version</a>. Fibre costs are made up.</footer>
+</div>
+
+<script src="../assets/site.js"></script>
+<script src="../assets/lca.js"></script>
+<script>
+const statusEl = document.getElementById("status");
+const M1 = "../module-1-product-lca/data/", M2 = "../module-2-material-substitution/data/";
+const WEIGHTS = [["climate", "Climate per wear", 35], ["microplastics", "Microplastics", 20], ["water", "Water", 15], ["end_of_life", "End of life", 10], ["cost", "Fibre cost", 20]];
+let factors, G, baseP, baseLegs, options, beyond, washes = {};
+
+weights.innerHTML = WEIGHTS.map(([k, l, w]) => `<label>${l}<input type="range" min="0" max="100" value="${w}" data-w="${k}"><output id="w-${k}"></output></label>`).join("");
+
+function optionProduct(o) {
+  return { ...baseP, garment_mass_g: o.garment_mass_g, yarn_type: o.yarn_type, washes_in_life: washes[o.option_id], tumble_dry_share_pct: o.tumble_dry_share_pct };
+}
+function calc() {
+  const wpw = +document.getElementById("wpw").value;
+  return options.map(o => {
+    const recipe = parseMaterials(o.materials), p = optionProduct(o);
+    const t = total(footprint(p, recipe, baseLegs, factors.value, G));
+    const lo = { ...factors.value }, hi = { ...factors.value };
+    Object.keys(recipe).forEach(m => [m, LANDFILL[m]].forEach(id => { lo[id] = factors.low[id]; hi[id] = factors.high[id]; }));
+    const wears = washes[o.option_id] * wpw;
+    return { o, t, perWear: 1000 * t / wears,
+      lowW: 1000 * total(footprint(p, recipe, baseLegs, lo, G)) / wears,
+      highW: 1000 * total(footprint(p, recipe, baseLegs, hi, G)) / wears,
+      cost: materialFlow(p, factors.value).fibre * +o.fibre_cost_eur_per_kg };
+  });
+}
+
+function render() {
+  const rows = calc();
+  const max = Math.max(...rows.map(r => r.highW));
+  bars.innerHTML = [...rows].sort((a, b) => a.perWear - b.perWear).map(r => `<div class="row"><span>${esc(r.o.option_id)}. ${esc(r.o.option_name)}</span>
+    <span class="track" title="${r.lowW.toFixed(0)} to ${r.highW.toFixed(0)} g CO2e per wear"><span class="fill" style="width:${100 * r.perWear / max}%"></span>
+    <span class="range" style="left:${100 * r.lowW / max}%;width:${100 * (r.highW - r.lowW) / max}%"></span></span>
+    <span class="num">${r.perWear.toFixed(0)} g</span></div>`).join("");
+
+  const w = Object.fromEntries([...document.querySelectorAll("[data-w]")].map(i => [i.dataset.w, +i.value]));
+  const wsum = Object.values(w).reduce((a, b) => a + b, 0) || 1;
+  WEIGHTS.forEach(([k]) => document.getElementById("w-" + k).textContent = Math.round(100 * w[k] / wsum) + "%");
+  const climate = to1to5(rows.map(r => r.perWear)), cost = to1to5(rows.map(r => r.cost));
+  const B = Object.fromEntries(beyond.map(b => [b.option_id, b]));
+  const scored = rows.map((r, i) => {
+    const b = B[r.o.option_id];
+    const s = { climate: climate[i], cost: cost[i], microplastics: +b.microplastics_1to5, water: +b.water_1to5, end_of_life: +b.end_of_life_1to5 };
+    if (trust.checked && r.o.option_id === "E") s.microplastics = 4;
+    const total = Object.keys(s).reduce((a, k) => a + s[k] * w[k], 0) / wsum;
+    return { ...r, b, s, total };
+  }).sort((a, b) => b.total - a.total);
+  const cell = (v, why) => `<td class="num" title="${esc(why || "")}">${v.toFixed(1)}</td>`;
+  table.innerHTML = `<thead><tr><th>Option</th><th class="num">kg CO2e per garment</th><th>Washes in life</th><th class="num">g per wear</th><th class="num">Fibre cost</th>
+      <th class="num">Climate</th><th class="num">Microplastics</th><th class="num">Water</th><th class="num">End of life</th><th class="num">Cost</th><th>Weighted score</th><th>Evidence</th></tr></thead><tbody>` +
+    scored.map(r => `<tr><td>${esc(r.o.option_id)}. ${esc(r.o.option_name)}</td><td class="num">${r.t.toFixed(2)}</td>
+      <td><input type="number" min="5" max="300" step="5" value="${washes[r.o.option_id]}" data-o="${esc(r.o.option_id)}" aria-label="Washes in life"></td>
+      <td class="num">${r.perWear.toFixed(0)}</td><td class="num">€${r.cost.toFixed(2)}</td>
+      ${cell(r.s.climate, "Relative: lowest g per wear = 5")}${cell(r.s.microplastics, r.o.option_id === "E" && trust.checked ? "Supplier claim accepted WITHOUT test evidence" : r.b.microplastics_why)}
+      ${cell(r.s.water, r.b.water_why)}${cell(r.s.end_of_life, r.b.end_of_life_why)}${cell(r.s.cost, "Relative: cheapest fibre cost = 5")}
+      <td><span class="score" style="width:${r.total * 14}px"></span><strong>${r.total.toFixed(2)}</strong></td>
+      <td class="wrap small">${esc(r.b.evidence_1to5)}/5: ${esc(r.b.evidence_why)}</td></tr>`).join("") + "</tbody>";
+  return scored;
+}
+
+document.addEventListener("input", e => {
+  if (e.target.dataset.o) { washes[e.target.dataset.o] = Math.max(5, +e.target.value || 5); }
+  if (e.target.dataset.o || e.target.dataset.w || e.target.id === "wpw" || e.target.id === "trust") {
+    const active = e.target.dataset.o; render();
+    if (active) { const el = document.querySelector(`[data-o="${active}"]`); el.focus(); el.setSelectionRange?.(99, 99); }
+  }
+});
+document.getElementById("wpw").addEventListener("change", render);
+copy.addEventListener("click", async () => {
+  const s = render();
+  const text = "Screening-level comparison of fibre options for one performance T-shirt (not an ISO 14044 comparative assertion). " +
+    "Write a half-page recommendation for our product team: which option to test first, what evidence we must get from suppliers, " +
+    "and what we must NOT claim publicly. Do not change any numbers.\n\n" +
+    "Option | kg CO2e per garment | washes in life | g CO2e per wear (range) | weighted score | evidence\n" +
+    s.map(r => `${r.o.option_name} | ${r.t.toFixed(2)} | ${washes[r.o.option_id]} | ${r.perWear.toFixed(0)} (${r.lowW.toFixed(0)}-${r.highW.toFixed(0)}) | ${r.total.toFixed(2)} | ${r.b.evidence_why}`).join("\n") +
+    `\n\nOption E biodegradability claim accepted without evidence: ${trust.checked ? "yes" : "no"}.`;
+  try { await navigator.clipboard.writeText(text); statusEl.textContent = "Copied. Paste it into your AI chat."; }
+  catch { statusEl.textContent = "Your browser blocked copying."; }
+});
+
+Promise.all([fetchCSV(M1 + "emission_factors.csv"), fetchCSV(M1 + "grid_intensity.csv"), fetchCSV(M1 + "products.csv"),
+  fetchCSV(M1 + "transport_legs.csv"), fetchCSV(M2 + "material_options.csv"), fetchCSV(M2 + "beyond_carbon.csv")])
+  .then(([f, g, p, l, o, b]) => {
+    factors = factorTables(f); G = gridTables(g);
+    baseP = p.find(x => x.product_id === "P01"); baseLegs = l.filter(x => x.product_id === "P01");
+    options = o; beyond = b; o.forEach(x => washes[x.option_id] = +x.washes_in_life);
+    render(); statusEl.textContent = "Showing the sample data";
+  })
+  .catch(() => statusEl.textContent = "Could not load the sample data. Open this page from your GitHub Pages site.");
+</script>
+</body>
+</html>

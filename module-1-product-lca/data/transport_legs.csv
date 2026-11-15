@@ -1,0 +1,23 @@
+product_id,leg,cargo,mode,distance_km
+P01,Fibre to mill,fibre,truck,600
+P01,Factory to Shanghai port,garment,truck,300
+P01,Shanghai to Hamburg,garment,sea,19500
+P01,Hamburg to warehouse,garment,truck,500
+P02,Cotton lint from India,fibre,sea,2500
+P02,Chittagong port to mill,fibre,truck,300
+P02,Factory to Chittagong port,garment,truck,250
+P02,Chittagong to Hamburg,garment,sea,17500
+P02,Hamburg to warehouse,garment,truck,500
+P03,Fibre to mill,fibre,truck,600
+P03,Factory to Shanghai port,garment,truck,300
+P03,Shanghai to Hamburg,garment,sea,19500
+P03,Hamburg to warehouse,garment,truck,500
+P04,Fibre to mill,fibre,truck,500
+P04,Factory to airport,garment,truck,30
+P04,Ho Chi Minh City to Frankfurt (air),garment,air,10000
+P04,Frankfurt to warehouse,garment,truck,200
+P05,Fibre to mill,fibre,truck,450
+P05,Factory to warehouse,garment,truck,2600
+P06,Recycled fibre from Taiwan,fibre,sea,19000
+P06,Port to mill,fibre,truck,400
+P06,Factory to warehouse,garment,truck,2300
