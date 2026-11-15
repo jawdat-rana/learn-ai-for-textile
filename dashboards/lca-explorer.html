@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Product LCA Explorer</title>
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .layout { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 900px) { .layout { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); } }
+  .stack { display: flex; height: 22px; border-radius: 4px; overflow: hidden; background: var(--surface-2); }
+  .stack span { display: block; height: 100%; }
+  .prow { display: grid; grid-template-columns: minmax(120px, 190px) 1fr 64px; gap: 10px; align-items: center; font-size: 13px; padding: 5px 6px; border-radius: 8px; cursor: pointer; }
+  .prow:hover, .prow.on { background: var(--surface-2); }
+  @media (max-width: 600px) { .prow { grid-template-columns: 1fr 56px; } .prow .stack { grid-column: 1 / -1; grid-row: 2; } }
+  .tile .value { overflow-wrap: anywhere; }
+  .prow .num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .legend { display: flex; gap: 6px 14px; font-size: 12px; color: var(--ink-2); margin-top: 10px; flex-wrap: wrap; }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+  .bars .row { display: grid; grid-template-columns: 150px 1fr 92px; gap: 8px; align-items: center; font-size: 13px; margin: 6px 0; }
+  .bars .track { height: 14px; background: var(--surface-2); border-radius: 4px; position: relative; }
+  .bars .fill { height: 100%; border-radius: 0 4px 4px 0; }
+  .bars .ghost { position: absolute; top: -3px; height: 20px; border-right: 2px dashed var(--ink-3); }
+  .bars .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .whatif { display: grid; gap: 10px 16px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); font-size: 14px; }
+  .whatif label { display: flex; flex-direction: column; gap: 4px; }
+  .whatif output { font-weight: 600; font-variant-numeric: tabular-nums; }
+  .delta { font-size: 15px; margin: 12px 0 0; }
+  .tornado .row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 10px; align-items: center; font-size: 12px; margin: 5px 0; }
+  .tornado .track { position: relative; height: 14px; background: var(--surface-2); border-radius: 3px; }
+  .tornado .seg { position: absolute; top: 0; height: 100%; border-radius: 3px; background: var(--s1); }
+  .tornado .seg.Low { background: var(--s2); }
+  .tornado .base { position: absolute; top: -3px; height: 20px; border-left: 2px solid var(--ink); }
+  #status { font-size: 13px; color: var(--ink-2); }
+  details summary { cursor: pointer; font-weight: 600; padding: 8px 0; }
+  td.wrap { white-space: normal; min-width: 280px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="home" href="../index.html">← AI for Textile Professionals</a>
+    <nav class="links">
+      <a data-gh="module-1-product-lca/README.md" href="#">Module guide</a>
+      <a data-gh="module-1-product-lca/prompts.md" href="#">Prompts that built this</a>
+      <a data-gh="SOURCES.md" href="#">Sources</a>
+      <a data-gh="dashboards/lca-explorer.html" href="#">See the code</a>
+    </nav>
+  </header>
+
+  <h1>Product LCA Explorer</h1>
+  <p class="lede">A screening-level carbon footprint (kg CO2e) for six made-up textile products, from fibre to end of life. Pick a product, try what-ifs, and see which numbers matter most.</p>
+  <div class="callout warn small"><strong>Screening level, not an ISO 14040/44 study.</strong> Factors are rounded public values with wide ranges. Use this to find hotspots and ask better questions, never for claims on a label or website.</div>
+
+  <div class="controls">
+    <label>Try your own factors file <input type="file" id="file" accept=".csv"></label>
+    <button id="copy" class="primary">Copy summary for AI</button>
+    <span id="status"></span>
+  </div>
+  <p class="small muted">Your own file never leaves your browser. It needs the same columns as the <a data-gh="module-1-product-lca/data/emission_factors.csv" href="#">sample factors file</a>, so you can swap in your supplier's or database values.</p>
+
+  <div class="tiles" id="tiles"></div>
+
+  <section class="card">
+    <h3>All products, by life cycle stage</h3>
+    <p class="small muted" style="margin-top:0">kg CO2e per garment. Click a product to explore it below.</p>
+    <div id="allProducts"></div>
+    <div class="legend" id="legend"></div>
+  </section>
+
+  <h2 id="selTitle">Product</h2>
+  <div class="layout">
+    <section class="card">
+      <h3>Where the footprint comes from</h3>
+      <p class="small muted" style="margin-top:0">Dashed line = before your what-ifs.</p>
+      <div class="bars" id="stageBars"></div>
+      <p class="delta" id="delta"></p>
+    </section>
+    <section class="card">
+      <h3>What-ifs</h3>
+      <div class="whatif">
+        <label>Main fibre
+          <select id="wFibre">
+            <option value="">Keep as designed</option>
+            <option value="FIB_PES">100% virgin polyester</option>
+            <option value="FIB_RPES">100% recycled polyester</option>
+            <option value="FIB_CO">100% conventional cotton</option>
+            <option value="FIB_OCO">100% organic cotton</option>
+          </select></label>
+        <label>Spinning, weaving or knitting, and dyeing in
+          <select id="wMill"></select></label>
+        <label>Garment sewn in
+          <select id="wMake"></select></label>
+        <label>Long-distance shipping
+          <select id="wShip"><option value="">Keep as planned</option><option value="sea">All by sea</option><option value="air">All by air</option></select></label>
+        <label>Cutting waste <output id="oCut"></output>
+          <input type="range" id="wCut" min="5" max="30" step="1"></label>
+        <label>Washes in its life <output id="oWash"></output>
+          <input type="range" id="wWash" min="10" max="200" step="5"></label>
+        <label>Tumble dried <output id="oDry"></output>
+          <input type="range" id="wDry" min="0" max="100" step="5"></label>
+        <label>&nbsp;<button id="reset">Reset what-ifs</button></label>
+      </div>
+    </section>
+  </div>
+
+  <section class="card" style="margin-top:16px">
+    <h3>What moves the answer most</h3>
+    <p class="small muted" style="margin-top:0">Each bar shows the total if that one factor is at the low or high end of its published range. Orange = low-confidence factor. Check the biggest bars first.</p>
+    <div class="tornado" id="tornado"></div>
+  </section>
+
+  <h2>Factors used, with sources</h2>
+  <details>
+    <summary>Show all 39 factors, their ranges and sources</summary>
+    <p class="small muted">Codes like S4 are explained in <a data-gh="SOURCES.md" href="#">SOURCES.md</a>. "ASSUMPTION" means the course made it up as a reasonable placeholder.</p>
+    <div class="table-scroll"><table id="factorTable"></table></div>
+  </details>
+
+  <footer>Built by AI from the prompts in <a data-gh="module-1-product-lca/prompts.md" href="#">prompts.md</a>. The same model is in <a data-gh="module-1-product-lca/analysis/product_lca.py" href="#">the Python version</a> and <a data-gh="assets/lca.js" href="#">assets/lca.js</a>, so you can check one against the other. All products and companies are made up.</footer>
+</div>
+
+<script src="../assets/site.js"></script>
+<script src="../assets/lca.js"></script>
+<script>
+const statusEl = document.getElementById("status");
+const D = "../module-1-product-lca/data/";
+let factorRows, factors, G, products, bom, legs, problems = [], selected = "P01";
+
+const kg = n => n.toFixed(2);
+function base(pid) {
+  const p = products.find(x => x.product_id === pid);
+  return { p, recipe: recipeFor(bom, pid), legs: legs.filter(l => l.product_id === pid) };
+}
+function withWhatIfs(pid) {
+  const b = base(pid);
+  const p = { ...b.p, mill_country: wMill.value, make_country: wMake.value,
+    cut_waste_pct: +wCut.value, washes_in_life: +wWash.value, tumble_dry_share_pct: +wDry.value };
+  const recipe = wFibre.value ? { [wFibre.value]: 1 } : b.recipe;
+  if (wFibre.value) p.yarn_type = wFibre.value.includes("CO") ? "staple" : "filament";
+  // Switching shipping mode: flight routes are shorter than sea routes (roughly 55% of the distance).
+  let l = b.legs;
+  if (wShip.value) l = l.map(x => (x.mode === "sea" || x.mode === "air") ? { ...x, mode: wShip.value, distance_km: wShip.value === "air" && x.mode === "sea" ? Math.round(+x.distance_km * 0.55) : wShip.value === "sea" && x.mode === "air" ? Math.round(+x.distance_km * 1.8) : x.distance_km } : x);
+  return { p, recipe, legs: l };
+}
+const run = (x, F = factors.value) => footprint(x.p, x.recipe, x.legs, F, G);
+
+function resetWhatIfs() {
+  const p = base(selected).p;
+  wFibre.value = ""; wShip.value = "";
+  wMill.value = p.mill_country; wMake.value = p.make_country;
+  wCut.value = p.cut_waste_pct; wWash.value = p.washes_in_life; wDry.value = p.tumble_dry_share_pct;
+}
+
+function render() {
+  oCut.textContent = wCut.value + "%"; oWash.textContent = wWash.value; oDry.textContent = wDry.value + "% of washes";
+  // All products
+  const all = products.map(p => { const s = run(base(p.product_id)); return { p, s, t: total(s) }; });
+  const max = Math.max(...all.map(a => a.t));
+  allProducts.innerHTML = all.map(({ p, s, t }) => `<div class="prow ${p.product_id === selected ? "on" : ""}" data-id="${esc(p.product_id)}">
+      <span><strong>${esc(p.product_id)}</strong> ${esc(p.product_name)}</span>
+      <span class="stack" style="width:${100 * t / max}%">${STAGES.map((st, i) => `<span title="${st}: ${kg(s[st])} kg CO2e" style="width:${100 * s[st] / t}%;background:${STAGE_COLOURS[i]}"></span>`).join("")}</span>
+      <span class="num">${kg(t)}</span></div>`).join("");
+  legend.innerHTML = STAGES.map((st, i) => `<span><i style="background:${STAGE_COLOURS[i]}"></i>${st}</span>`).join("");
+
+  // Selected product
+  const b = base(selected), before = run(b), x = withWhatIfs(selected), after = run(x);
+  const tb = total(before), ta = total(after);
+  selTitle.textContent = `${b.p.product_id} ${b.p.product_name}`;
+  const big = STAGES.reduce((a, st) => after[st] > after[a] ? st : a, STAGES[0]);
+  tiles.innerHTML = [
+    ["Footprint per garment", kg(ta) + " kg", "kg CO2e, screening estimate"],
+    ["Per kg of garment", (ta / (+x.p.garment_mass_g / 1000)).toFixed(1), "kg CO2e per kg"],
+    ["Biggest stage", big, Math.round(100 * after[big] / ta) + "% of the total"],
+    ["Data warnings", problems.filter(m => m.startsWith(selected)).length, problems.filter(m => m.startsWith(selected)).join(" ") || "None for this product"],
+  ].map(([l, v, s]) => `<div class="tile"><div class="label">${l}</div><div class="value">${esc(v)}</div><div class="sub">${esc(s)}</div></div>`).join("");
+  const smax = Math.max(...STAGES.map(st => Math.max(before[st], after[st])));
+  stageBars.innerHTML = STAGES.map((st, i) => `<div class="row"><span>${st}</span>
+      <span class="track"><span class="fill" style="display:block;width:${100 * after[st] / smax}%;background:${STAGE_COLOURS[i]}"></span>
+      <span class="ghost" style="left:0;width:${100 * before[st] / smax}%"></span></span>
+      <span class="num">${kg(after[st])} kg</span></div>`).join("");
+  const pct = 100 * (ta - tb) / tb;
+  delta.innerHTML = Math.abs(pct) < 0.05 ? `Total <strong>${kg(ta)} kg CO2e</strong>. Change a what-if to compare.`
+    : `With your what-ifs: <strong>${kg(ta)} kg CO2e</strong>, ${pct < 0 ? "down" : "up"} <strong>${Math.abs(pct).toFixed(1)}%</strong> from ${kg(tb)}.`;
+
+  // Sensitivity on the what-if version
+  const rows = factorRows.map(r => {
+    const lo = total(run(x, { ...factors.value, [r.factor_id]: +r.low })), hi = total(run(x, { ...factors.value, [r.factor_id]: +r.high }));
+    return { r, lo: Math.min(lo, hi), hi: Math.max(lo, hi), swing: Math.abs(hi - lo) };
+  }).filter(o => o.swing > 1e-9).sort((a, b) => b.swing - a.swing).slice(0, 8);
+  const tmin = Math.min(ta, ...rows.map(o => o.lo)) * 0.95, tmax = Math.max(ta, ...rows.map(o => o.hi)) * 1.02;
+  const pos = v => 100 * (v - tmin) / (tmax - tmin);
+  tornado.innerHTML = rows.map(o => `<div class="row"><span>${esc(o.r.item)} <span class="pill conf-${esc(o.r.confidence)}">${esc(o.r.confidence)}</span></span>
+      <span class="track" title="${kg(o.lo)} to ${kg(o.hi)} kg CO2e"><span class="seg ${esc(o.r.confidence)}" style="left:${pos(o.lo)}%;width:${pos(o.hi) - pos(o.lo)}%"></span>
+      <span class="base" style="left:${pos(ta)}%"></span></span></div>`).join("") +
+    `<p class="small muted">Scale ${kg(tmin)} to ${kg(tmax)} kg CO2e. Black line = current total.</p>`;
+}
+
+function drawFactorTable() {
+  factorTable.innerHTML = `<thead><tr><th>Stage</th><th>Item</th><th class="num">Value</th><th>Unit</th><th class="num">Range</th><th>Confidence</th><th>Source</th><th>Notes</th></tr></thead><tbody>` +
+    factorRows.map(r => `<tr><td>${esc(r.stage)}</td><td class="wrap">${esc(r.item)}</td><td class="num">${esc(r.value)}</td><td>${esc(r.unit)}</td>
+      <td class="num">${esc(r.low)} to ${esc(r.high)}</td><td><span class="pill conf-${esc(r.confidence)}">${esc(r.confidence)}</span></td>
+      <td>${esc(r.source)}</td><td class="wrap small">${esc(r.notes || "")}</td></tr>`).join("") + "</tbody>";
+}
+
+function useFactors(rows, label) {
+  const need = ["factor_id", "value", "low", "high"];
+  const missing = need.filter(c => !(c in (rows[0] || {})));
+  if (missing.length) { statusEl.textContent = "Missing columns: " + missing.join(", "); return; }
+  factorRows = rows; factors = factorTables(rows);
+  statusEl.textContent = label; drawFactorTable(); render();
+}
+
+const ids = ["wFibre", "wMill", "wMake", "wShip", "wCut", "wWash", "wDry"];
+ids.forEach(id => document.getElementById(id).addEventListener("input", render));
+reset.addEventListener("click", () => { resetWhatIfs(); render(); });
+allProducts.addEventListener("click", e => {
+  const id = e.target.closest(".prow")?.dataset.id; if (!id) return;
+  selected = id; resetWhatIfs(); render();
+});
+file.addEventListener("change", async e => {
+  const f = e.target.files[0]; if (f) useFactors(parseCSV(await f.text()), "Using your factors: " + f.name);
+});
+// The selected product's what-if settings and result, as text (exercise 2 in Part 2 uses this).
+function whatIfText() {
+  const b = base(selected), x = withWhatIfs(selected), tb = total(run(b)), after = run(x), ta = total(after);
+  return `${b.p.product_id} ${b.p.product_name}. Settings: fibre ${wFibre.value || "as designed"}, mill ${x.p.mill_country}, ` +
+    `sewing ${x.p.make_country}, shipping ${wShip.value || "as planned"}, cutting waste ${x.p.cut_waste_pct}%, ` +
+    `${x.p.washes_in_life} washes, tumble dried ${x.p.tumble_dry_share_pct}%. ` +
+    `Before ${kg(tb)}, after ${kg(ta)} kg CO2e (${(100 * (ta - tb) / tb).toFixed(1)}%). By stage after: ` +
+    STAGES.map(st => `${st} ${kg(after[st])}`).join(", ");
+}
+copy.addEventListener("click", async () => {
+  const lines = products.map(p => { const s = run(base(p.product_id)), t = total(s);
+    return `${p.product_id} ${p.product_name} | ${kg(t)} | ` + STAGES.map(st => `${st} ${Math.round(100 * s[st] / t)}%`).join(", "); });
+  const text = "Here are screening-level carbon footprint results (kg CO2e per garment, cradle to grave) for six products. " +
+    "They are NOT an ISO 14040/44 study. Write a one-page internal summary: the hotspots, the 3 levers worth testing first, " +
+    "and what data we should collect from suppliers to make this more accurate. Do not change any numbers.\n\n" +
+    "Product | kg CO2e | share by stage\n" + lines.join("\n") + "\n\nData warnings: " + (problems.join(" ") || "none") +
+    "\n\nSelected product with what-ifs: " + whatIfText();
+  try { await navigator.clipboard.writeText(text); statusEl.textContent = "Copied. Paste it into your AI chat."; }
+  catch { statusEl.textContent = "Your browser blocked copying. Select the chart text and copy it instead."; }
+});
+
+Promise.all(["emission_factors.csv", "grid_intensity.csv", "products.csv", "bill_of_materials.csv", "transport_legs.csv"].map(f => fetchCSV(D + f)))
+  .then(([f, g, p, b, l]) => {
+    G = gridTables(g); products = p; bom = b; legs = l;
+    products.forEach(x => recipeFor(bom, x.product_id, problems));
+    const countries = g.map(r => r.country).filter(c => c !== "EU-27");
+    [wMill, wMake].forEach(s => s.innerHTML = countries.map(c => `<option>${esc(c)}</option>`).join(""));
+    factorRows = f; factors = factorTables(f);
+    resetWhatIfs(); drawFactorTable(); render();
+    statusEl.textContent = "Showing the sample data";
+  })
+  .catch(() => statusEl.textContent = "Could not load the sample data. Open this page from your GitHub Pages site.");
+</script>
+</body>
+</html>

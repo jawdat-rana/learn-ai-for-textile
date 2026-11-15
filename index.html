@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI for Textile Professionals</title>
+<meta name="description" content="A free, hands-on AI course for textile technology and product professionals who don't code: product lifecycle analysis and material choices with free AI tools.">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .hero { padding: 24px 0 8px; }
+  .hero .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-ink); }
+  .big-idea { font-size: 19px; border-left: 4px solid var(--accent); padding: 6px 0 6px 16px; max-width: 760px; margin: 20px 0; }
+  .steps { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); counter-reset: s; }
+  .steps .card p { margin: 4px 0 0; font-size: 14px; color: var(--ink-2); }
+  .module { display: flex; flex-direction: column; gap: 8px; }
+  .module .tag { font-size: 12px; font-weight: 600; color: var(--ink-2); }
+  .module p { margin: 0; font-size: 15px; color: var(--ink-2); flex: 1; }
+  .module .actions { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; margin-top: 6px; }
+  .btn { display: inline-block; padding: 8px 14px; border-radius: 8px; background: var(--accent); color: #fff; text-decoration: none; font-weight: 600; font-size: 14px; }
+  ul.list { margin: 0; padding-left: 18px; }
+  ul.list li { margin: 4px 0; }
+  .challenges label { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 15px; cursor: pointer; }
+  .challenges label:last-child { border-bottom: 0; }
+  .challenges input { margin-top: 4px; width: 18px; height: 18px; accent-color: var(--accent); flex: none; }
+  .progress { height: 8px; background: var(--surface-2); border-radius: 4px; overflow: hidden; margin: 8px 0 4px; }
+  .progress span { display: block; height: 100%; background: var(--good); border-radius: 0 4px 4px 0; transition: width .2s; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="home" href="index.html">AI for Textile Professionals</a>
+    <nav class="links">
+      <a data-gh="START-HERE.md" href="#">Start here</a>
+      <a href="#modules">Projects</a>
+      <a href="#kits">Prompt kits</a>
+      <a href="#advanced">Part 2</a>
+      <a data-gh-repo href="#">GitHub</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">Free course · no coding · free AI tools only</div>
+    <h1>Run your own product lifecycle analysis with AI, without writing a line of code</h1>
+    <p class="lede">For textile technology, product and sustainability managers. Screen a product's carbon footprint from fibre to end of life, compare material options honestly, and know when you really need a consultant. Made-up products, public emission factors, free AI tools.</p>
+    <div class="big-idea">You think of the use case. The AI writes the code, explains it and fixes it. <strong>Your job is judging whether the answer is right.</strong></div>
+    <a class="btn" data-gh="START-HERE.md" href="#">Set up in 15 minutes →</a>
+  </section>
+
+  <h2>How it works</h2>
+  <div class="steps">
+    <div class="card"><h3><span class="step-num">1</span>Copy</h3><p>Copy the course into your own free GitHub account. You get this website too.</p></div>
+    <div class="card"><h3><span class="step-num">2</span>Prompt</h3><p>Follow copy-paste prompts in Claude, ChatGPT or Gemini (free plans).</p></div>
+    <div class="card"><h3><span class="step-num">3</span>Run</h3><p>The AI writes Python. Run it in the chat, or in Google Colab with one click.</p></div>
+    <div class="card"><h3><span class="step-num">4</span>Check</h3><p>Every module ends with "where AI is wrong": invented factors, unit slips and over-claiming.</p></div>
+  </div>
+
+  <h2>Foundations <span class="muted small">45 minutes</span></h2>
+  <div class="grid">
+    <a class="card" style="text-decoration:none;color:inherit" data-gh="00-foundations/01-how-ai-works.md" href="#"><h3>1. How AI chat tools work</h3><p class="muted small" style="margin:0">What they're good and bad at, and what never to paste in.</p></a>
+    <a class="card" style="text-decoration:none;color:inherit" data-gh="00-foundations/02-prompting-for-technical-leaders.md" href="#"><h3>2. Prompting for technical leaders</h3><p class="muted small" style="margin:0">Brief the AI like a capable new analyst.</p></a>
+    <a class="card" style="text-decoration:none;color:inherit" data-gh="00-foundations/03-you-dont-need-to-code.md" href="#"><h3>3. You don't need to code</h3><p class="muted small" style="margin:0">Get AI to write, run, explain and fix code for you.</p></a>
+    <a class="card" style="text-decoration:none;color:inherit" data-gh="00-foundations/04-lca-in-15-minutes.md" href="#"><h3>4. LCA in 15 minutes</h3><p class="muted small" style="margin:0">Functional unit, boundary, factors, and screening vs ISO studies.</p></a>
+  </div>
+
+  <h2 id="modules">Flagship projects</h2>
+  <div class="grid">
+    <div class="card module">
+      <span class="tag">MODULE 1 · 90-120 MIN</span>
+      <h3>Product Lifecycle Screening</h3>
+      <p>A cradle-to-grave carbon footprint for six made-up garments, split into eight stages. Find the hotspots, see which numbers matter most, test what-ifs, and write an internal summary and a consultant brief.</p>
+      <div class="actions">
+        <a class="btn" href="dashboards/lca-explorer.html">Open dashboard</a>
+        <a data-gh="module-1-product-lca/README.md" href="#">Guide</a>
+        <a data-gh="module-1-product-lca/prompts.md" href="#">Prompts</a>
+        <a data-colab="module-1-product-lca/analysis/product_lca.ipynb" href="#">Run in Colab</a>
+      </div>
+    </div>
+    <div class="card module">
+      <span class="tag">MODULE 2 · 90 MIN</span>
+      <h3>Material Substitution Explorer</h3>
+      <p>Six fibre options for one T-shirt, per garment and per wear, with uncertainty ranges. Weigh microplastics, water, end of life and cost, and write a recommendation that doesn't over-claim.</p>
+      <div class="actions">
+        <a class="btn" href="dashboards/materials.html">Open dashboard</a>
+        <a data-gh="module-2-material-substitution/README.md" href="#">Guide</a>
+        <a data-gh="module-2-material-substitution/prompts.md" href="#">Prompts</a>
+        <a data-colab="module-2-material-substitution/analysis/material_compare.ipynb" href="#">Run in Colab</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout warn" style="margin-top:16px"><strong>Honest about limits:</strong> this is screening-level LCA for internal decisions, not an ISO 14040/44 study. It tells you where the impact is and what to measure; it doesn't give you numbers for a label. <a data-gh="SOURCES.md" href="#">Every factor is sourced.</a></div>
+
+  <h2 id="kits">Prompt kits <span class="muted small">reuse every week</span></h2>
+  <div class="grid">
+    <a class="card" style="text-decoration:none;color:inherit" data-gh="prompt-kits/supplier-sustainability-data-check.md" href="#"><h3>Supplier data check</h3><p class="muted small" style="margin:0">What's usable in supplier questionnaires, and what to ask next.</p></a>
+    <a class="card" style="text-decoration:none;color:inherit" data-gh="prompt-kits/green-claims-check.md" href="#"><h3>Green claims check</h3><p class="muted small" style="margin:0">Test marketing copy before it goes out.</p></a>
+    <a class="card" style="text-decoration:none;color:inherit" data-gh="prompt-kits/lca-scope-and-consultant-brief.md" href="#"><h3>LCA consultant brief</h3><p class="muted small" style="margin:0">Comparable, cheaper quotes for the study you really need.</p></a>
+    <a class="card" style="text-decoration:none;color:inherit" data-gh="prompt-kits/lab-report-to-plain-english.md" href="#"><h3>Lab report explainer</h3><p class="muted small" style="margin:0">What a biodegradation or shedding test does and doesn't prove.</p></a>
+  </div>
+
+  <h2 id="advanced">Part 2 (advanced): skills, agents and AI teams</h2>
+  <div class="card">
+    <p style="margin-top:0">When you've finished the projects: package your LCA method as a reusable skill, run a Planner → Analyst → Critical Reviewer team by hand, then build a real agent team in Google Colab with a free API key.</p>
+    <ul class="list">
+      <li><a data-gh="part-2-advanced/exercise-1-build-a-skill.md" href="#">Exercise 1: Build a skill</a> (no code)</li>
+      <li><a data-gh="part-2-advanced/exercise-2-agent-team-no-code.md" href="#">Exercise 2: Run an agent team by hand</a> (no code)</li>
+      <li><a data-gh="part-2-advanced/exercise-3-agent-team-in-colab.md" href="#">Exercise 3: Build a real agent team</a> (<a data-colab="part-2-advanced/agents/lca_agents.ipynb" href="#">open in Colab</a>)</li>
+    </ul>
+  </div>
+
+  <h2>Your 10 challenges</h2>
+  <div class="card">
+    <div class="progress"><span id="bar" style="width:0"></span></div>
+    <div class="small muted" id="count">0 of 10 done</div>
+    <div class="challenges" id="challenges"></div>
+    <p class="small muted" style="margin-bottom:0">Ticks are saved in this browser only. Keep notes in <a data-gh-edit="my-ai-journal.md" href="#">your AI journal</a> (opens the editor on GitHub).</p>
+  </div>
+
+  <footer>All products and companies in this course are made up; emission factors are public and <a data-gh="SOURCES.md" href="#">sourced</a>. Use only AI tools your company has approved for real work. Course pages are plain HTML and JavaScript, <a data-gh="index.html" href="#">written by AI</a>.</footer>
+</div>
+
+<script src="assets/site.js"></script>
+<script>
+const CHALLENGES = [
+  "Live: your own copy and website are live",
+  "Better brief: run an R-C-T-F-C prompt in two AI tools and compare",
+  "Footprint: finish Module 1 and find each product's biggest stage",
+  "Caught it: catch an invented factor, a units slip or a hidden fix",
+  "Code without coding: run AI-written Python without typing code",
+  "Change it in English: get the AI to change the code and re-run it",
+  "Fair comparison: finish Module 2 and say what the data can't separate",
+  "Real work: use a prompt kit on a real (anonymised) work document",
+  "Ship a page: publish a new AI-built page on your site",
+  "Advanced: build a skill or run an agent team (Part 2)",
+];
+const KEY = "ai-textile-course-challenges";
+let done = [];
+try { done = JSON.parse(localStorage.getItem(KEY)) || []; } catch { done = []; }
+function draw() {
+  document.getElementById("challenges").innerHTML = CHALLENGES.map((c, i) => {
+    const [title, rest] = c.split(": ");
+    return `<label><input type="checkbox" data-i="${i}" ${done.includes(i) ? "checked" : ""}><span><strong>${i + 1}. ${title}.</strong> ${rest[0].toUpperCase() + rest.slice(1)}</span></label>`;
+  }).join("");
+  document.getElementById("bar").style.width = (done.length * 10) + "%";
+  document.getElementById("count").textContent = `${done.length} of 10 done`;
+}
+document.getElementById("challenges").addEventListener("change", e => {
+  const i = +e.target.dataset.i;
+  done = e.target.checked ? [...new Set([...done, i])] : done.filter(x => x !== i);
+  try { localStorage.setItem(KEY, JSON.stringify(done)); } catch {}
+  draw();
+});
+draw();
+</script>
+</body>
+</html>

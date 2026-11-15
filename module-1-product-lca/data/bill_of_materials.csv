@@ -1,0 +1,9 @@
+product_id,component,material,share_pct
+P01,Body fabric,FIB_PES,100
+P02,Body fabric,FIB_CO,100
+P03,Body fabric,FIB_PES,100
+P04,Body fabric,FIB_PA,78
+P04,Body fabric,FIB_EL,22
+P05,Body fabric,FIB_PES,65
+P05,Body fabric,FIB_CO,35
+P06,Shell fabric,FIB_RPES,85

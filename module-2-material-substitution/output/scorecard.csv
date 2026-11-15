@@ -1,0 +1,7 @@
+option_id,option_name,climate,cost,microplastics,water,end_of_life,evidence,weighted_score
+B,Recycled polyester (bottles),5.0,4.48,1,5,3,3,3.9
+A,Virgin polyester,4.37,5.0,1,5,3,4,3.78
+E,Polyester with biodegradability additive (generic),4.33,3.78,1,5,2,1,3.42
+F,Recycled polyester and organic cotton blend 50/50,3.29,2.77,2,3,1,3,2.66
+D,Organic cotton,1.82,1.0,4,2,3,3,2.24
+C,Conventional cotton,1.0,2.44,4,1,3,3,2.09

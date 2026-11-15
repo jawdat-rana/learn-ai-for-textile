@@ -1,0 +1,7 @@
+option_id,microplastics_1to5,microplastics_why,water_1to5,water_why,end_of_life_1to5,end_of_life_why,evidence_1to5,evidence_why
+A,1,Sheds persistent microfibres in every wash.,5,Little water at the fibre stage.,3,Mono-material; recyclable in principle but rarely recycled fibre-to-fibre today.,4,Well studied; many public data sets.
+B,1,Sheds like virgin polyester; some studies suggest more.,5,Little water at the fibre stage.,3,Same as virgin polyester; bottles taken out of the bottle loop.,3,Results depend a lot on allocation method.
+C,4,Fibres biodegrade; dyes and finishes slow this down.,1,Often irrigated in water-stressed regions.,3,Mechanically recyclable (shorter fibres); compostable in principle.,3,Huge variation between farms and countries.
+D,4,Fibres biodegrade; dyes and finishes slow this down.,2,Often more rain-fed; evidence on water is mixed.,3,As conventional cotton.,3,Recent studies (2026) changed published values a lot.
+E,1,Unknown until tested. Score 1 until you have test evidence; see the toggle in the dashboard.,5,Little water at the fibre stage.,2,Unknown effect on polyester recycling streams; ask the supplier.,1,Only supplier claims in this example. Ask for test reports.
+F,2,Half the fibre is polyester; still sheds persistent microfibres.,3,Half the fibre is cotton.,1,Blends are hard to recycle fibre-to-fibre.,3,Average of the two fibres.
